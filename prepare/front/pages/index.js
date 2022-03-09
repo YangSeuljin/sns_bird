@@ -1,10 +1,17 @@
-//next는 pages 폴더 안에 있는 파일들을 자동으로
-
 import AppLayout from "../components/AppLayout";
+import {useSelector} from "react-redux";
+import PostForm from "../components/PostForm";
+import PostCard from "../components/PostCard";
 
 const Home = () => {
+    const {isLoggedIn} = useSelector((state) => state.user);
+    const {mainPosts} = useSelector((state) => state.post);
     return (
-        <AppLayout><div>Hello, Next!</div></AppLayout>
+        <AppLayout>
+            {isLoggedIn && <PostForm/>}
+            {/*map을 쓰면 key가 무조건 들어가야한다.*/}
+            {mainPosts.map((post) => <PostCard key={post.id} post={post}/>)}
+        </AppLayout>
     );
 }
 

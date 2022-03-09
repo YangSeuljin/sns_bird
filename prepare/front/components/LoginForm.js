@@ -1,32 +1,31 @@
 import {Button, Form, Input} from 'antd';
-import {useCallback, useMemo, useState} from 'react';
+import {useCallback, useMemo} from 'react';
 import Link from 'next/link';
 import styled from "styled-components";
-import PropTypes from "prop-types";
-import useinput from "../hooks/useInput";
 import useInput from "../hooks/useInput";
 import {useDispatch} from 'react-redux';
-import {loginAction} from "../reducers";
+import {loginAction} from "../reducers/user";
 
 const ButtonWrapper = styled.div`
   marginTop: 10px;`
 
 const FormWrapper = styled(Form)`
-    padding: 10px;
+  padding: 10px;
 `
 
 const LoginForm = () => {
     const dispatch = useDispatch();
-    
+
     //useInput.js에 커스텀훅으로 중복 제거
     const [id, onChangeId] = useInput('');
     const [password, onChangePassword] = useInput('');
 
     const style = useMemo(() => ({marginTop: 10}), []);
 
-    const onSubmitForm = useCallback(()=>{
-        dispatch(loginAction({id,password}));
-    },[id,password]);
+    const onSubmitForm = useCallback(() => {
+        console.log("form");
+        dispatch(loginAction({id, password}));
+    }, [id, password]);
 
     return (
         <FormWrapper onFinish={onSubmitForm}>
