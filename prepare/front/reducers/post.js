@@ -28,7 +28,7 @@ export const initialState = {
     imagePaths: [],
     addPostLoading: false,
     addPostDone: false,
-    addPostError: fanulllse,
+    addPostError: null,
 }
 
 export const ADD_POST_REQUEST = 'ADD_POST_REQUEST';

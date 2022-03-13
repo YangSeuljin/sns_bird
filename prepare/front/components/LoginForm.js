@@ -15,24 +15,24 @@ const FormWrapper = styled(Form)`
 
 const LoginForm = () => {
     const dispatch = useDispatch();
-    const {isLoggingIn} = useSelector((state) => state.user);
+    const {loginLoading} = useSelector((state) => state.user);
 
     //useInput.js에 커스텀훅으로 중복 제거
-    const [id, onChangeId] = useInput('');
+    const [email, onChangeEmail] = useInput('');
     const [password, onChangePassword] = useInput('');
 
     const style = useMemo(() => ({marginTop: 10}), []);
 
     const onSubmitForm = useCallback(() => {
-        dispatch(loginRequestAction({id, password}));
-    }, [id, password]);
+        dispatch(loginRequestAction({email, password}));
+    }, [email, password]);
 
     return (
         <FormWrapper onFinish={onSubmitForm}>
             <div>
-                <label htmlFor="user-id">아이디</label>
+                <label htmlFor="user-id">이메일</label>
                 <br/>
-                <Input name="user-id" value={id} onChange={onChangeId} required/>
+                <Input name="user-id" type="email" value={email} onChange={onChangeEmail} required/>
             </div>
             <div>
                 <label htmlFor="user-id">비밀번호</label>
@@ -40,7 +40,7 @@ const LoginForm = () => {
                 <Input name="user-password" type="password" value={password} onChange={onChangePassword} required/>
             </div>
             <ButtonWrapper>
-                <Button type="primary" htmlType="submit" loading={isLoggingIn}>로그인</Button>
+                <Button type="primary" htmlType="submit" loading={loginLoading}>로그인</Button>
                 <Link href="/signup"><a>회원가입</a></Link>
             </ButtonWrapper>
         </FormWrapper>
