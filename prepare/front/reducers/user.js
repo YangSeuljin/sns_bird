@@ -25,6 +25,10 @@ export const SIGN_UP_REQUEST = 'SIGN_UP_REQUEST';
 export const SIGN_UP_SUCCESS = 'SIGN_UP_SUCCESS';
 export const SIGN_UP_FAILURE = 'SIGN_UP_FAILURE';
 
+export const CHANGE_NICKNAME_SUCCESS = 'SIGN_UP_SUCCESS';
+export const CHANGE_NICKNAME_REQUEST = 'SIGN_UP_REQUEST';
+export const CHANGE_NICKNAME_FAILURE = 'SIGN_UP_FAILURE';
+
 export const FOLLOW_REQUEST = 'FOLLOW_REQUEST';
 export const FOLLOW_SUCCESS = 'FOLLOW_SUCCESS';
 export const FOLLOW_FAILURE = 'FOLLOW_FAILURE';
@@ -128,6 +132,25 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 signUpLoading: false,
                 signUpError: action.error,
+            };
+        case CHANGE_NICKNAME_REQUEST:
+            return {
+                ...state,
+                changeNicknameLoading: true,
+                changeNicknameDone: false,
+                changeNicknameError: null,
+            };
+        case CHANGE_NICKNAME_SUCCESS:
+            return {
+                ...state,
+                changeNicknameLoading: false,
+                changeNicknameDone: true,
+            };
+        case CHANGE_NICKNAME_FAILURE:
+            return {
+                ...state,
+                changeNicknameLoading: false,
+                changeNicknameError: action.error,
             };
         default:
             return state;

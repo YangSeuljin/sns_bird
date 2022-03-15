@@ -2,21 +2,25 @@ import { all, delay, fork, put, takeLatest } from 'redux-saga/effects';
 import axios from 'axios';
 
 import {
-    FOLLOW_FAILURE,
-    FOLLOW_REQUEST,
-    FOLLOW_SUCCESS,
-    LOG_IN_FAILURE,
     LOG_IN_REQUEST,
     LOG_IN_SUCCESS,
-    LOG_OUT_FAILURE,
+    LOG_IN_FAILURE,
+
     LOG_OUT_REQUEST,
     LOG_OUT_SUCCESS,
-    SIGN_UP_FAILURE,
+    LOG_OUT_FAILURE,
+
     SIGN_UP_REQUEST,
     SIGN_UP_SUCCESS,
-    UNFOLLOW_FAILURE,
+    SIGN_UP_FAILURE,
+
+    FOLLOW_REQUEST,
+    FOLLOW_SUCCESS,
+    FOLLOW_FAILURE,
+
     UNFOLLOW_REQUEST,
     UNFOLLOW_SUCCESS,
+    UNFOLLOW_FAILURE,
 } from '../reducers/user';
 
 function logInAPI(data) {
