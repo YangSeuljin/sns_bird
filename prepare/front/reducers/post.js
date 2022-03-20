@@ -16,7 +16,9 @@ export const initialState = {
             src: 'https://bookthumb-phinf.pstatic.net/cover/137/995/13799585.jpg?udate-20180726',
         }],
         Comments: [{
+            id: shortId.generate(),
             User: {
+                id: shortId.generate(),
                 nickname: 'nero'
             },
             content: '우와 개정판이 니왔군요~',
@@ -31,6 +33,9 @@ export const initialState = {
     addPostLoading: false,
     addPostDone: false,
     addPostError: null,
+    removePostLoading: false,
+    removePostDone: false,
+    removePostError: null,
     addCommentLoading: false,
     addCommentDone: false,
     addCommentError: null,
@@ -39,6 +44,10 @@ export const initialState = {
 export const ADD_POST_REQUEST = 'ADD_POST_REQUEST';
 export const ADD_POST_SUCCESS = 'ADD_POST_SUCCESS';
 export const ADD_POST_FAILURE = 'ADD_POST_FAILURE';
+
+export const REMOVE_POST_REQUEST = 'REMOVE_POST_REQUEST';
+export const REMOVE_POST_SUCCESS = 'REMOVE_POST_SUCCESS';
+export const REMOVE_POST_FAILURE = 'REMOVE_POST_FAILURE';
 
 export const ADD_COMMENT_REQUEST = 'ADD_COMMENT_REQUEST';
 export const ADD_COMMENT_SUCCESS = 'ADD_COMMENT_SUCCESS';
@@ -56,8 +65,8 @@ export const addComment = (data) => ({
 })
 
 const dummyPost = (data) => ({
-    id: shortId.generate(),
-    content: data,
+    id: data.id,
+    content: data.content,
     User: {
         id: 1,
         nickname: '제로초',
@@ -98,6 +107,31 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 addPostLoading: false,
                 addPostDone: action.error,
+            };
+
+        case REMOVE_POST_REQUEST:
+            return {
+                ...state,
+                removePostLoading: true,
+                removePostDone: false,
+                removePostError: null
+            }
+
+        case REMOVE_POST_SUCCESS:
+            console.log(action.data);
+            console.log(state.mainPosts);
+            return {
+                ...state,
+                mainPosts: state.mainPosts.filter((v) => v.id !== action.data),
+                removePostLoading: false,
+                removePostDone: true,
+            };
+
+        case REMOVE_POST_FAILURE:
+            return {
+                ...state,
+                removePostLoading: false,
+                removePostDone: action.error,
             };
         case ADD_COMMENT_REQUEST:
             return {
