@@ -1,4 +1,4 @@
-import { all, delay, fork, put, takeLatest } from 'redux-saga/effects';
+import {all, delay, fork, put, takeLatest, call} from 'redux-saga/effects';
 import axios from 'axios';
 
 import {
@@ -20,21 +20,39 @@ import {
 
     UNFOLLOW_REQUEST,
     UNFOLLOW_SUCCESS,
-    UNFOLLOW_FAILURE,
+    UNFOLLOW_FAILURE, LOAD_USER_REQUEST, LOAD_USER_SUCCESS, LOAD_USER_FAILURE,
 } from '../reducers/user';
 
+function loadUserAPI(data) {
+    return axios.get('/user');
+}
+
+function* loadUser(action) {
+    try {
+        const result = yield call(loadUserAPI, action.data);
+        yield put({
+            type: LOAD_USER_SUCCESS,
+            data: result.data,
+        });
+    } catch (err) {
+        console.error(err);
+        yield put({
+            type: LOAD_USER_FAILURE,
+            error: err.response.data,
+        });
+    }
+}
+
 function logInAPI(data) {
-    return axios.post('/api/login', data);
+    return axios.post('/user/login', data);
 }
 
 function* logIn(action) {
     try {
-        console.log('saga logIn');
-        // const result = yield call(logInAPI);
-        yield delay(1000);
+        const result = yield call(logInAPI, action.data);
         yield put({
             type: LOG_IN_SUCCESS,
-            data: action.data,
+            data: result.data,
         });
     } catch (err) {
         console.error(err);
@@ -46,13 +64,12 @@ function* logIn(action) {
 }
 
 function logOutAPI() {
-    return axios.post('/api/logout');
+    return axios.post('/user/logout');
 }
 
 function* logOut() {
     try {
-        // const result = yield call(logOutAPI);
-        yield delay(1000);
+        const result = yield call(logOutAPI);
         yield put({
             type: LOG_OUT_SUCCESS,
         });
@@ -65,13 +82,14 @@ function* logOut() {
     }
 }
 
-function signUpAPI() {
-    return axios.post('/api/signUp');
+function signUpAPI(data) {
+    return axios.post('/user', data);
 }
 
-function* signUp() {
+function* signUp(action) {
     try {
-        // const result = yield call(signUpAPI);
+        const result = yield call(signUpAPI, action.data);
+        console.log(result);
         yield delay(1000);
         yield put({
             type: SIGN_UP_SUCCESS,
@@ -127,6 +145,10 @@ function* unfollow(action) {
     }
 }
 
+function* watchLoadUser() {
+    yield takeLatest(LOAD_USER_REQUEST, loadUser);
+}
+
 function* watchFollow() {
     yield takeLatest(FOLLOW_REQUEST, follow);
 }
@@ -149,6 +171,7 @@ function* watchSignUp() {
 
 export default function* userSaga() {
     yield all([
+        fork(watchLoadUser),
         fork(watchFollow),
         fork(watchUnfollow),
         fork(watchLogIn),

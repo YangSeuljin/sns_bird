@@ -1,5 +1,5 @@
 import {Button, Form, Input} from 'antd';
-import {useCallback, useMemo} from 'react';
+import {useCallback, useEffect, useMemo} from 'react';
 import Link from 'next/link';
 import styled from "styled-components";
 import useInput from "../hooks/useInput";
@@ -15,11 +15,17 @@ const FormWrapper = styled(Form)`
 
 const LoginForm = () => {
     const dispatch = useDispatch();
-    const {loginLoading} = useSelector((state) => state.user);
+    const {loginLoading, logInError} = useSelector((state) => state.user);
 
     //useInput.js에 커스텀훅으로 중복 제거
     const [email, onChangeEmail] = useInput('');
     const [password, onChangePassword] = useInput('');
+
+    useEffect(() => {
+        if (logInError) {
+            alert(logInError);
+        }
+    }, [logInError])
 
     const style = useMemo(() => ({marginTop: 10}), []);
 
