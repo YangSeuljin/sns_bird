@@ -13,9 +13,9 @@ const Home = () => {
     const { mainPosts, hasMorePost, loadPostsLoading } = useSelector((state) => state.post);
 
     useEffect(()=>{
-/*        dispatch({
+        dispatch({
             type: LOAD_POSTS_REQUEST,
-        });*/
+        });
 
        dispatch({
             type: LOAD_USER_REQUEST,

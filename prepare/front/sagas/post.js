@@ -17,14 +17,14 @@ function loadPostsApI(data) {
 function* loadPosts(action) {
     try {
         const result = yield call(loadPostsApI, action.data);
-        const id = shortId.generate();
+        //const id = shortId.generate();
         yield put({
             type: LOAD_POSTS_SUCCESS, data: result.data,
         });
     } catch (error) {
         console.error(error);
         yield put({
-            type: LOAD_POSTS_FAILURE, data: err.response.data,
+            type: LOAD_POSTS_FAILURE, data: error.response.data,
         });
     }
 }
@@ -71,15 +71,15 @@ function* removePost(action) {
 }
 
 function addCommentAPI(data) {
-    return axios.post(`/api/post/${data.postId}/comment`, data);
+    return axios.post(`/post/${data.postId}/comment`, data);
 }
 
 function* addComment(action) {
-    console.log(action);
     try {
-        const result = yield call(addPostAPI, action.data);
+        const result = yield call(addCommentAPI, action.data);
+        console.log(result);
         yield put({
-            type: ADD_COMMENT_SUCCESS, data: action.data,
+            type: ADD_COMMENT_SUCCESS, data: result.data,
         })
     } catch (err) {
         console.error(err);
