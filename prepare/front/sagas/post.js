@@ -4,11 +4,82 @@ import {
     ADD_COMMENT_FAILURE,
     ADD_COMMENT_SUCCESS,
     ADD_POST_FAILURE,
-    ADD_POST_SUCCESS, generateDummyPost, LOAD_POSTS_FAILURE, LOAD_POSTS_SUCCESS,
-    REMOVE_POST_SUCCESS
+    ADD_POST_SUCCESS,
+    generateDummyPost,
+    LIKE_POST_FAILURE,
+    LIKE_POST_SUCCESS,
+    LOAD_POSTS_FAILURE,
+    LOAD_POSTS_SUCCESS,
+    REMOVE_POST_FAILURE,
+    REMOVE_POST_SUCCESS,
+    UNLIKE_POST_FAILURE,
+    UNLIKE_POST_SUCCESS
 } from "../reducers/post";
-import {ADD_POST_TO_ME, REMOVE_POST_OF_ME} from "../reducers/user";
+import {
+    ADD_POST_TO_ME,
+    REMOVE_FOLLOWER_FAILURE,
+    REMOVE_FOLLOWER_REQUEST,
+    REMOVE_FOLLOWER_SUCCESS,
+    REMOVE_POST_OF_ME
+} from "../reducers/user";
 import shortId from "shortid";
+
+function removeFollowerApI(data) {
+    return axios.delete(`/user/follower/${data}`);
+}
+
+function* removeFollower(action) {
+    try {
+        const result = yield call(removeFollowerApI, action.data);
+        //const id = shortId.generate();
+        yield put({
+            type: REMOVE_FOLLOWER_SUCCESS, data: result.data,
+        });
+    } catch (error) {
+        console.error(error);
+        yield put({
+            type: REMOVE_FOLLOWER_FAILURE, data: error.response.data,
+        });
+    }
+}
+
+function likePostsApI(data) {
+    return axios.patch(`/post/${data}/like`, data);
+}
+
+function* likePost(action) {
+    try {
+        const result = yield call(likePostsApI, action.data);
+        //const id = shortId.generate();
+        yield put({
+            type: LIKE_POST_SUCCESS, data: result.data,
+        });
+    } catch (error) {
+        console.error(error);
+        yield put({
+            type: LIKE_POST_FAILURE, data: error.response.data,
+        });
+    }
+}
+
+function unlikePostsApI(data) {
+    return axios.delete(`/post/${data}/like`, data);
+}
+
+function* unlikePost(action) {
+    try {
+        const result = yield call(unlikePostsApI, action.data);
+        //const id = shortId.generate();
+        yield put({
+            type: UNLIKE_POST_SUCCESS, data: result.data,
+        });
+    } catch (error) {
+        console.error(error);
+        yield put({
+            type: UNLIKE_POST_FAILURE, data: error.response.data,
+        });
+    }
+}
 
 function loadPostsApI(data) {
     return axios.get('/posts', data)
@@ -30,12 +101,10 @@ function* loadPosts(action) {
 }
 
 function addPostAPI(data) {
-    console.log(data);
-    return axios.post('/post', {content:data});
+    return axios.post('/post', {content: data});
 }
 
 function* addPost(action) {
-    console.log(action.data);
     try {
         const result = yield call(addPostAPI, action.data);
         yield put({
@@ -52,10 +121,13 @@ function* addPost(action) {
     }
 }
 
+function removePostAPI(data) {
+    return axios.delete(`/post/${data}`, data);
+}
+
 function* removePost(action) {
     try {
-        //onst result = yield call(addPostAPI, action.data);
-        yield delay(1000);
+        const result = yield call(removePostAPI, action.data);
         yield put({
             type: REMOVE_POST_SUCCESS,
             data: action.data,
@@ -65,7 +137,7 @@ function* removePost(action) {
         })
     } catch (err) {
         yield put({
-            type: ADD_POST_FAILURE, data: err.response.data,
+            type: REMOVE_POST_FAILURE, data: err.response.data,
         });
     }
 }
@@ -77,7 +149,6 @@ function addCommentAPI(data) {
 function* addComment(action) {
     try {
         const result = yield call(addCommentAPI, action.data);
-        console.log(result);
         yield put({
             type: ADD_COMMENT_SUCCESS, data: result.data,
         })
@@ -87,6 +158,18 @@ function* addComment(action) {
             type: ADD_COMMENT_FAILURE, data: err.response.data,
         });
     }
+}
+
+function* watchRemoveFollower() {
+    yield takeLatest(REMOVE_FOLLOWER_REQUEST, removeFollower);
+}
+
+function* watchLikePost() {
+    yield takeLatest('LIKE_POST_REQUEST', likePost);
+}
+
+function* watchUnlikePost() {
+    yield takeLatest('UNLIKE_POST_REQUEST', unlikePost);
 }
 
 function* watchLoadPosts() {
@@ -106,5 +189,5 @@ function* watchAddComment() {
 }
 
 export default function* postSaga() {
-    yield all([fork(watchAddPost), fork(watchRemovePost), fork(watchAddComment), fork(watchLoadPosts)])
+    yield all([fork(watchRemoveFollower), fork(watchLikePost), fork(watchUnlikePost), fork(watchAddPost), fork(watchRemovePost), fork(watchAddComment), fork(watchLoadPosts)])
 }
