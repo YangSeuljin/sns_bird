@@ -13,7 +13,7 @@ import {
     REMOVE_POST_FAILURE,
     REMOVE_POST_SUCCESS,
     UNLIKE_POST_FAILURE,
-    UNLIKE_POST_SUCCESS
+    UNLIKE_POST_SUCCESS, UPLOAD_IMAGES_FAILURE, UPLOAD_IMAGES_REQUEST, UPLOAD_IMAGES_SUCCESS
 } from "../reducers/post";
 import {
     ADD_POST_TO_ME,
@@ -23,6 +23,25 @@ import {
     REMOVE_POST_OF_ME
 } from "../reducers/user";
 import shortId from "shortid";
+
+function uploadImagesApI(data) {
+    return axios.post('/post/images', data);
+}
+
+function* uploadImages(action) {
+    try {
+        const result = yield call(uploadImagesApI, action.data);
+        yield put({
+            type: UPLOAD_IMAGES_SUCCESS, data: result.data,
+        });
+    } catch (error) {
+        console.error(error);
+        yield put({
+            type: UPLOAD_IMAGES_FAILURE, data: error.response.data,
+        });
+    }
+}
+
 
 function removeFollowerApI(data) {
     return axios.delete(`/user/follower/${data}`);
@@ -101,7 +120,7 @@ function* loadPosts(action) {
 }
 
 function addPostAPI(data) {
-    return axios.post('/post', {content: data});
+    return axios.post('/post', data);
 }
 
 function* addPost(action) {
@@ -160,6 +179,10 @@ function* addComment(action) {
     }
 }
 
+function* watchUploadImages() {
+    yield takeLatest(UPLOAD_IMAGES_REQUEST, uploadImages);
+}
+
 function* watchRemoveFollower() {
     yield takeLatest(REMOVE_FOLLOWER_REQUEST, removeFollower);
 }
@@ -189,5 +212,5 @@ function* watchAddComment() {
 }
 
 export default function* postSaga() {
-    yield all([fork(watchRemoveFollower), fork(watchLikePost), fork(watchUnlikePost), fork(watchAddPost), fork(watchRemovePost), fork(watchAddComment), fork(watchLoadPosts)])
+    yield all([fork(watchUploadImages), fork(watchRemoveFollower), fork(watchLikePost), fork(watchUnlikePost), fork(watchAddPost), fork(watchRemovePost), fork(watchAddComment), fork(watchLoadPosts)])
 }
