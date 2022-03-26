@@ -29,6 +29,9 @@ export const initialState = {
     uploadImagesLoading: false,
     uploadImagesDone: false,
     uploadImagesError: null,
+    retweetLoading: false,
+    retweetDone: false,
+    retweetError: null,
 };
 
 export const generateDummyPost = (number) => Array(number).fill().map(() => ({
@@ -78,6 +81,10 @@ export const ADD_COMMENT_REQUEST = 'ADD_COMMENT_REQUEST';
 export const ADD_COMMENT_SUCCESS = 'ADD_COMMENT_SUCCESS';
 export const ADD_COMMENT_FAILURE = 'ADD_COMMENT_FAILURE';
 
+export const RETWEET_REQUEST = 'RETWEET_REQUEST';
+export const RETWEET_SUCCESS = 'RETWEET_SUCCESS';
+export const RETWEET_FAILURE = 'RETWEET_FAILURE';
+
 export const REMOVE_IMAGE = 'REMOVE_IMAGE';
 
 export const addPost = (data) => ({
@@ -112,6 +119,21 @@ const dummyComment = (data) => ({
 // 이전 상태를 액션을 통해 다음 상태로 만들어내는 함수(불변성은 지키면서)
 const reducer = (state = initialState, action) => produce(state, (draft) => {
     switch (action.type) {
+        case RETWEET_REQUEST:
+            draft.retweetLoading = true;
+            draft.retweeDone = false;
+            draft.retweeError = null;
+            break;
+        case RETWEET_SUCCESS: {
+            draft.retweeLoading = false;
+            draft.retweeDone = true;
+            draft.mainPosts.unshift(action.data);
+            break;
+        }
+        case RETWEET_FAILURE:
+            draft.retweeLoading = false;
+            draft.retweetError = action.data;
+            break;
         case REMOVE_IMAGE:
             draft.imagePaths = draft.imagePaths.filter((v, i) => i !== action.data);
             break;
