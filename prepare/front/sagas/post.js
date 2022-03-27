@@ -118,13 +118,13 @@ function* unlikePost(action) {
     }
 }
 
-function loadPostsApI(data) {
-    return axios.get('/posts', data)
+function loadPostsApI(lastId) {
+    return axios.get(`/posts?lastId=${lastId || 0}`, lastId)
 }
 
 function* loadPosts(action) {
     try {
-        const result = yield call(loadPostsApI, action.data);
+        const result = yield call(loadPostsApI, action.lastId);
         //const id = shortId.generate();
         yield put({
             type: LOAD_POSTS_SUCCESS, data: result.data,
@@ -234,5 +234,5 @@ function* watchAddComment() {
 }
 
 export default function* postSaga() {
-    yield all([fork(watchRetweet),fork(watchUploadImages), fork(watchRemoveFollower), fork(watchLikePost), fork(watchUnlikePost), fork(watchAddPost), fork(watchRemovePost), fork(watchAddComment), fork(watchLoadPosts)])
+    yield all([fork(watchRetweet), fork(watchUploadImages), fork(watchRemoveFollower), fork(watchLikePost), fork(watchUnlikePost), fork(watchAddPost), fork(watchRemovePost), fork(watchAddComment), fork(watchLoadPosts)])
 }
