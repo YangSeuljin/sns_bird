@@ -7,7 +7,7 @@ import {
     ADD_POST_SUCCESS,
     generateDummyPost,
     LIKE_POST_FAILURE,
-    LIKE_POST_SUCCESS,
+    LIKE_POST_SUCCESS, LOAD_POST_FAILURE, LOAD_POST_SUCCESS,
     LOAD_POSTS_FAILURE,
     LOAD_POSTS_SUCCESS,
     REMOVE_POST_FAILURE,
@@ -118,6 +118,26 @@ function* unlikePost(action) {
     }
 }
 
+function loadPostAPI(data) {
+    return axios.get(`/post/${data}`);
+}
+
+function* loadPost(action) {
+    try {
+        const result = yield call(loadPostAPI, action.data);
+        yield put({
+            type: LOAD_POST_SUCCESS,
+            data: result.data,
+        });
+    } catch (err) {
+        console.error(err);
+        yield put({
+            type: LOAD_POST_FAILURE,
+            data: err.response.data,
+        });
+    }
+}
+
 function loadPostsApI(lastId) {
     return axios.get(`/posts?lastId=${lastId || 0}`, lastId)
 }
@@ -217,6 +237,10 @@ function* watchUnlikePost() {
     yield takeLatest('UNLIKE_POST_REQUEST', unlikePost);
 }
 
+function* watchLoadPost() {
+    yield takeLatest('LOAD_POST_REQUEST', loadPost);
+}
+
 function* watchLoadPosts() {
     yield throttle(5000, 'LOAD_POSTS_REQUEST', loadPosts);
 }
@@ -234,5 +258,5 @@ function* watchAddComment() {
 }
 
 export default function* postSaga() {
-    yield all([fork(watchRetweet), fork(watchUploadImages), fork(watchRemoveFollower), fork(watchLikePost), fork(watchUnlikePost), fork(watchAddPost), fork(watchRemovePost), fork(watchAddComment), fork(watchLoadPosts)])
+    yield all([fork(watchRetweet), fork(watchUploadImages), fork(watchRemoveFollower), fork(watchLikePost), fork(watchUnlikePost), fork(watchAddPost), fork(watchRemovePost), fork(watchAddComment), fork(watchLoadPost), fork(watchLoadPosts)])
 }
