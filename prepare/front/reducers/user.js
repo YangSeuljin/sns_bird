@@ -1,21 +1,24 @@
 import produce from "immer";
 
 export const initialState = {
-    loadUserLoading: false, //팔로우 시도중
+    loadMyInfoLoading: false,
+    loadMyInfoDone: false,
+    loadMyInfoError: null,
+    loadUserLoading: false,
     loadUserDone: false,
-    loadUserError: null, //팔 시도중
-    followLoading: false, //팔로우 시도중
+    loadUserError: null,
+    followLoading: false,
     followDone: false,
-    followError: null, //팔 시도중
-    unfollowInLoading: false, //로그인 시도중
+    followError: null,
+    unfollowInLoading: false,
     unfollowInDone: false,
-    unfollowInError: null, //로그아웃 시도중
-    logInLoading: false, //로그인 시도중
+    unfollowInError: null,
+    logInLoading: false,
     logInDone: false,
-    logInError: null, //로그아웃 시도중
-    logOutLoading: false, //로그인 시도중
+    logInError: null,
+    logOutLoading: false,
     logOutDone: false,
-    logOutError: null, //로그아웃 시도중
+    logOutError: null,
     signUpLoading: false,
     signUpDone: false,
     signUpError: null,
@@ -32,9 +35,14 @@ export const initialState = {
     removeFollowerDone: false,
     removeFollowerError: null,
     me: null,
+    userInfo: null,
     signUpData: {},
     loginData: {},
 }
+
+export const LOAD_MY_INFO_REQUEST = 'LOAD_MY_INFO_REQUEST';
+export const LOAD_MY_INFO_SUCCESS = 'LOAD_MY_INFO_SUCCESS';
+export const LOAD_MY_INFO_FAILURE = 'LOAD_MY_INFO_FAILURE';
 
 export const LOAD_USER_REQUEST = 'LOAD_USER_REQUEST';
 export const LOAD_USER_SUCCESS = 'LOAD_USER_SUCCESS';
@@ -159,6 +167,20 @@ const reducer = (state = initialState, action) => {
                 draft.loadFollowersLoading = false;
                 draft.loadFollowersError = action.error;
                 break;
+            case LOAD_MY_INFO_REQUEST:
+                draft.loadMyInfoLoading = true;
+                draft.loadMyInfoError = null;
+                draft.loadMyInfoDone = false;
+                break;
+            case LOAD_MY_INFO_SUCCESS:
+                draft.loadMyInfoLoading = false;
+                draft.me = action.data;
+                draft.loadMyInfoDone = true;
+                break;
+            case LOAD_MY_INFO_FAILURE:
+                draft.loadMyInfoLoading = false;
+                draft.loadMyInfoError = action.error;
+                break;
             case LOAD_USER_REQUEST:
                 draft.loadUserLoading = true;
                 draft.loadUserError = null;
@@ -166,7 +188,7 @@ const reducer = (state = initialState, action) => {
                 break;
             case LOAD_USER_SUCCESS:
                 draft.loadUserLoading = false;
-                draft.me = action.data;
+                draft.userInfo = action.data;
                 draft.loadUserDone = true;
                 break;
             case LOAD_USER_FAILURE:

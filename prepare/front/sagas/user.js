@@ -29,11 +29,15 @@ import {
     CHANGE_NICKNAME_SUCCESS,
     LOAD_FOLLOWERS_REQUEST,
     LOAD_FOLLOWINGS_REQUEST,
-    LOAD_FOLLOWERS_SUCCESS, LOAD_FOLLOWERS_FAILURE, LOAD_FOLLOWINGS_SUCCESS, LOAD_FOLLOWINGS_FAILURE,
+    LOAD_FOLLOWERS_SUCCESS,
+    LOAD_FOLLOWERS_FAILURE,
+    LOAD_FOLLOWINGS_SUCCESS,
+    LOAD_FOLLOWINGS_FAILURE,
+    LOAD_MY_INFO_REQUEST, LOAD_MY_INFO_SUCCESS, LOAD_MY_INFO_FAILURE,
 } from '../reducers/user';
 
 function loadFollowingsAPI(data) {
-    return axios.get('/user/followings',data);
+    return axios.get('/user/followings', data);
 }
 
 function* loadFollowings(action) {
@@ -53,7 +57,7 @@ function* loadFollowings(action) {
 }
 
 function loadFollowersAPI(data) {
-    return axios.get('/user/followers',data);
+    return axios.get('/user/followers', data);
 }
 
 function* loadFollowers(action) {
@@ -73,7 +77,7 @@ function* loadFollowers(action) {
 }
 
 function changeNicknameAPI(data) {
-    return axios.patch('/user/nickname',{nickname: data});
+    return axios.patch('/user/nickname', {nickname: data});
 }
 
 function* changeNickname(action) {
@@ -93,7 +97,7 @@ function* changeNickname(action) {
 }
 
 function loadUserAPI(data) {
-    return axios.get('/user');
+    return axios.get(`/user/${data}`);
 }
 
 function* loadUser(action) {
@@ -107,6 +111,26 @@ function* loadUser(action) {
         console.error(err);
         yield put({
             type: LOAD_USER_FAILURE,
+            error: err.response.data,
+        });
+    }
+}
+
+function loadMyInfoAPI(data) {
+    return axios.get('/user');
+}
+
+function* loadMyInfo(action) {
+    try {
+        const result = yield call(loadMyInfoAPI, action.data);
+        yield put({
+            type: LOAD_MY_INFO_SUCCESS,
+            data: result.data,
+        });
+    } catch (err) {
+        console.error(err);
+        yield put({
+            type: LOAD_MY_INFO_FAILURE,
             error: err.response.data,
         });
     }
@@ -177,7 +201,7 @@ function followAPI(data) {
 
 function* follow(action) {
     try {
-        const result = yield call(followAPI,action.data);
+        const result = yield call(followAPI, action.data);
         yield put({
             type: FOLLOW_SUCCESS,
             data: result.data,
@@ -197,7 +221,7 @@ function unfollowAPI(data) {
 
 function* unfollow(action) {
     try {
-        const result = yield call(unfollowAPI,action.data);
+        const result = yield call(unfollowAPI, action.data);
         yield put({
             type: UNFOLLOW_SUCCESS,
             data: result.data,
@@ -227,6 +251,10 @@ function* watchLoadUser() {
     yield takeLatest(LOAD_USER_REQUEST, loadUser);
 }
 
+function* watchLoadMyInfo() {
+    yield takeLatest(LOAD_MY_INFO_REQUEST, loadMyInfo);
+}
+
 function* watchFollow() {
     yield takeLatest(FOLLOW_REQUEST, follow);
 }
@@ -253,6 +281,7 @@ export default function* userSaga() {
         fork(watchLoadFollowings),
         fork(watchChangeNickname),
         fork(watchLoadUser),
+        fork(watchLoadMyInfo),
         fork(watchFollow),
         fork(watchUnfollow),
         fork(watchLogIn),
