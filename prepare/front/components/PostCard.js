@@ -1,20 +1,24 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, { useState, useCallback } from 'react';
+import PropTypes from 'prop-types';
+import { useSelector, useDispatch } from 'react-redux';
+import { Card, Popover, Button, Avatar, List, Comment } from 'antd';
+import {
+    RetweetOutlined, HeartOutlined, MessageOutlined, EllipsisOutlined, HeartTwoTone,
+} from '@ant-design/icons';
+import Link from 'next/link';
+import moment from 'moment';
 
-import {EllipsisOutlined, HeartOutlined, HeartTwoTone, MessageOutlined, RetweetOutlined} from "@ant-design/icons";
-import {Avatar, Button, Card, Comment, List, Popover} from "antd";
-import PropTypes from "prop-types";
-import {useDispatch, useSelector} from "react-redux";
-import PostImages from "./PostImages";
-import CommentForm from "./CommentForm";
-import PostCardContent from "./PostCardContent";
-import {LIKE_POST_REQUEST, REMOVE_POST_REQUEST, RETWEET_REQUEST, UNLIKE_POST_REQUEST} from "../reducers/post";
-import FollowButton from "./FollowButton";
+import PostImages from './PostImages';
+import CommentForm from './CommentForm';
+import PostCardContent from './PostCardContent';
+import { LIKE_POST_REQUEST, REMOVE_POST_REQUEST, UNLIKE_POST_REQUEST, RETWEET_REQUEST } from '../reducers/post';
+import FollowButton from './FollowButton';
 
-const PostCard = ({post}) => {
-    // const {me} = useSelector((state) => state.user);
+moment.locale('ko');
+
+const PostCard = ({ post }) => {
     const dispatch = useDispatch();
-    const {removePostLoading, retweetError} = useSelector((state => state.post));
-    //const [liked, setLiked] = useState(false);
+    const { removePostLoading } = useSelector((state) => state.post);
     const [commentFormOpened, setCommentFormOpened] = useState(false);
     const id = useSelector((state) => state.user.me?.id);
 
@@ -27,7 +31,6 @@ const PostCard = ({post}) => {
             data: post.id,
         });
     }, [id]);
-
     const onUnlike = useCallback(() => {
         if (!id) {
             return alert('로그인이 필요합니다.');
@@ -37,11 +40,7 @@ const PostCard = ({post}) => {
             data: post.id,
         });
     }, [id]);
-
     const onToggleComment = useCallback(() => {
-        if (!id) {
-            return alert('로그인이 필요합니다.');
-        }
         setCommentFormOpened((prev) => !prev);
     }, []);
 
@@ -49,10 +48,10 @@ const PostCard = ({post}) => {
         if (!id) {
             return alert('로그인이 필요합니다.');
         }
-        dispatch({
+        return dispatch({
             type: REMOVE_POST_REQUEST,
             data: post.id,
-        })
+        });
     }, [id]);
 
     const onRetweet = useCallback(() => {
@@ -62,13 +61,10 @@ const PostCard = ({post}) => {
         return dispatch({
             type: RETWEET_REQUEST,
             data: post.id,
-        })
+        });
     }, [id]);
 
-    console.log(post);
     const liked = post.Likers.find((v) => v.id === id);
-
-    //const id = me && me.id;
     return (
         <div style={{ marginBottom: 20 }}>
             <Card
@@ -105,19 +101,23 @@ const PostCard = ({post}) => {
                         <Card
                             cover={post.Retweet.Images[0] && <PostImages images={post.Retweet.Images} />}
                         >
+                            <span style={{ float: 'right' }}>{moment(post.createdAt).format('YYYY.MM.DD.')}</span>
                             <Card.Meta
-                                avatar={<Avatar>{post.Retweet.User.nickname[0]}</Avatar>}
+                                avatar={<Link href={`/user/${post.Retweet.User.id}`}><a><Avatar>{post.Retweet.User.nickname[0]}</Avatar></a></Link>}
                                 title={post.Retweet.User.nickname}
                                 description={<PostCardContent postData={post.Retweet.content} />}
                             />
                         </Card>
                     )
                     : (
-                        <Card.Meta
-                            avatar={<Avatar>{post.User.nickname[0]}</Avatar>}
-                            title={post.User.nickname}
-                            description={<PostCardContent postData={post.content} />}
-                        />
+                        <>
+                            <span style={{ float: 'right' }}>{moment(post.createdAt).format('YYYY.MM.DD.')}</span>
+                            <Card.Meta
+                                avatar={<Link href={`/user/${post.User.id}`}><a><Avatar>{post.User.nickname[0]}</Avatar></a></Link>}
+                                title={post.User.nickname}
+                                description={<PostCardContent postData={post.content} />}
+                            />
+                        </>
                     )}
             </Card>
             {commentFormOpened && (
@@ -131,7 +131,7 @@ const PostCard = ({post}) => {
                             <li>
                                 <Comment
                                     author={item.User.nickname}
-                                    avatar={<Avatar>{item.User.nickname[0]}</Avatar>}
+                                    avatar={<Link href={`/user/${item.User.id}`}><a><Avatar>{item.User.nickname[0]}</Avatar></a></Link>}
                                     content={item.content}
                                 />
                             </li>
